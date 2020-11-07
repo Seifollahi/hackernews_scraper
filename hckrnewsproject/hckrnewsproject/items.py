@@ -13,4 +13,6 @@ class HckrnewsprojectItem(scrapy.Item):
     url = scrapy.Field()
     points = scrapy.Field()
     date = scrapy.Field()
+    comments = scrapy.Field()
+    user = scrapy.Field()
     pass

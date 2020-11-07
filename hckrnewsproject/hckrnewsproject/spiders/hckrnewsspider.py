@@ -23,16 +23,24 @@ class hckrnewsSpider(CrawlSpider):
 
         for title in titles:
             id = title.xpath("./@id").get()
-            points = response.xpath("//tr/td[@class='subtext']/span[@id='score_{id}']/text()".format(id=id)).extract_first()
-            time = response.xpath("//tr/td[@class='subtext']/span[@class= 'age']/a[@href='item?id={id}']/text()".format(id=id)).get().split(' ', 1)[0]
+            points = response.xpath("//tr/td[@class='subtext']/span[@id='score_{id}']/text()".format(id=id)).extract_first().split()[0]
+            time = response.xpath("//tr/td[@class='subtext']/span[@class= 'age']/a[@href='item?id={id}']/text()".format(id=id)).get().split()[0]
+            comments = response.xpath("//tr/td[@class='subtext']/a[@href='item?id={id}']/text()".format(id=id)).get()
 
+            if comments !='discuss':
+                comments = comments.split()[0]
+            else:
+                comments = 0
+            
+            
             item['id']= id
             item['title']= title.xpath(".//a[@class='storylink']/text()").get()
             item['source']= title.xpath(".//span[@class= 'sitestr']/text()").get()
             item['url']= title.xpath(".//a[@class='storylink']/@href").get()
-            item['points']= points
+            item['points']= int(points)
+            item['comments']= int(comments)
             item['date'] = datetime.now() - timedelta(hours=int(time))
-
+            
             yield item
 
             
