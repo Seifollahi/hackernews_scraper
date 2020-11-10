@@ -7,7 +7,8 @@ import scrapy
 
 
 class HckrnewsprojectItem(scrapy.Item):
-    id = scrapy.Field()
+    
+    post_id = scrapy.Field()
     title = scrapy.Field()
     source = scrapy.Field()
     url = scrapy.Field()
