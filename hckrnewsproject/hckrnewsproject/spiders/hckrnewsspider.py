@@ -1,9 +1,11 @@
 import scrapy
-from hckrnewsproject.items import HckrnewsprojectItem
+from items import HckrnewsprojectItem
 from scrapy.spiders import Rule
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider
 from datetime import datetime, timedelta
+
+from scrapy.shell import inspect_response
 
 class hckrnewsSpider(CrawlSpider):
     name = "hckrnews"
@@ -18,12 +20,14 @@ class hckrnewsSpider(CrawlSpider):
 
     
     def parse(self,response):
+        # inspect_response(response, self)
         titles = response.xpath("//table[@class= 'itemlist']").xpath(".//tr[@class= 'athing']")
         item = HckrnewsprojectItem()
 
         for title in titles:
             post_id = title.xpath("./@id").get()
             points = response.xpath("//tr/td[@class='subtext']/span[@id='score_{id}']/text()".format(id=post_id)).extract_first().split()[0]
+            user = response.xpath("//tr/td[@class='subtext']/span[@id='score_{id}']//following-sibling::a[@class='hnuser']/text()".format(id=post_id)).extract_first()
             time = response.xpath("//tr/td[@class='subtext']/span[@class= 'age']/a[@href='item?id={id}']/text()".format(id=post_id)).get().split()[0]
             comments = response.xpath("//tr/td[@class='subtext']/a[@href='item?id={id}']/text()".format(id=post_id)).get()
 
@@ -36,7 +40,7 @@ class hckrnewsSpider(CrawlSpider):
             
             item['post_id']= post_id
             item['title']= title.xpath(".//a[@class='storylink']/text()").get()
-            item['user'] = "NA"
+            item['user'] = user
             item['source']= title.xpath(".//span[@class= 'sitestr']/text()").get()
             item['url']= title.xpath(".//a[@class='storylink']/@href").get()
             item['points']= int(points)
@@ -44,6 +48,8 @@ class hckrnewsSpider(CrawlSpider):
             item['date'] = datetime.now() - timedelta(hours=int(time))
             
             yield item
+
+    print("Scraping in Process...")
 
             
 
